@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-enhanced-symbols-prettifier",
+  "name": "enhanced-symbols-prettifier",
   "version": "1.0.0",
   "description": "Replace/substitute the symbols with actual symbols you commonly type. It also works for emojis shortcuts, abbreviations, greek letters, math symbols or other snippets/aliases you define",
   "main": "main.js",
