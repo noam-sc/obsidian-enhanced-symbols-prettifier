@@ -3,13 +3,6 @@ import { SearchCursor } from 'src/search';
 import { EnhancedSymbolsPrettifierSettingsTab } from './settings';
 import { DEFAULT_SETTINGS, Settings } from './defaultSettings';
 
-// interface HTMLObject {
-// 	transform: string;
-// 	classes: string;
-// 	element: string;
-// }
-
-
 export default class EnhancedSymbolsPrettifier extends Plugin {
 	settings: Settings;
 	async onload() {
@@ -18,30 +11,6 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		this.addSettingTab(
 			new EnhancedSymbolsPrettifierSettingsTab(this.app, this)
 		);
-
-		// this.addCommand({
-		//   id: "symbols-prettifier-add-important",
-		//   name: "Add important symbol",
-		//   editorCallback: (editor) => {
-		//     const cursor = editor.getCursor();
-		//     const symbol = characterMapDefault["!important"];
-		//     if (typeof symbol !== "string") {
-		//       editor.replaceRange(symbol.element, cursor);
-		//     }
-		//   },
-		// });
-
-		// this.addCommand({
-		//   id: "symbols-prettifier-add-unclear",
-		//   name: "Add unclear symbol",
-		//   editorCallback: (editor) => {
-		//     const cursor = editor.getCursor();
-		//     const symbol = characterMapDefault["?unclear"];
-		//     if (typeof symbol !== "string") {
-		//       editor.replaceRange(symbol.element, cursor);
-		//     }
-		//   },
-		// });
 
 		this.addCommand({
 			id: 'symbols-prettifier-format-symbols',
@@ -136,20 +105,11 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 
 			const character = replacement.value;
 
-			if (typeof character === 'string') {
-				value =
-					value.substring(0, matchedChar.from - diff) +
-					character +
-					value.substring(matchedChar.to - diff);
-				diff += symbol.length - character.length;
-			} 
-      // else {
-			// 	value =
-			// 		value.substring(0, matchedChar.from - diff) +
-			// 		character.element +
-			// 		value.substring(matchedChar.to - diff);
-			// 	diff += symbol.length - character.element.length;
-			// }
+			value =
+				value.substring(0, matchedChar.from - diff) +
+				character +
+				value.substring(matchedChar.to - diff);
+			diff += symbol.length - character.length;
 			replacementsCount++;
 		});
 
@@ -193,20 +153,11 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 					typeof replaceCharacter !== 'function' &&
 					!this.isCursorInUnwantedBlocks(view.editor)
 				) {
-					if (typeof replaceCharacter === 'string') {
-						view.editor.replaceRange(
-							replaceCharacter,
-							{ line: cursor.line, ch: from },
-							{ line: cursor.line, ch: cursor.ch }
-						);
-					} 
-          // else {
-					// 	view.editor.replaceRange(
-					// 		`<span class="${replaceCharacter.classes}">${replaceCharacter.transform}</span>`,
-					// 		{ line: cursor.line, ch: from },
-					// 		{ line: cursor.line, ch: cursor.ch }
-					// 	);
-					// }
+					view.editor.replaceRange(
+						replaceCharacter,
+						{ line: cursor.line, ch: from },
+						{ line: cursor.line, ch: cursor.ch }
+					);
 				}
 			}
 		}
