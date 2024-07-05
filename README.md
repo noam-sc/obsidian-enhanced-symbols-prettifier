@@ -6,6 +6,8 @@ This plugin allows you to **prettify several character combinations** so that th
 
 For instance, if you type `->`, it will be replaced with `→`. If you type `<-`, it will be substituted with `←`. The same goes for all other symbols.
 
+![Demonstration](./assets/demo.gif)
+
 ## How to use
 
 The easiest way to use the plugin is to install it and then try to type the following symbols. All of these symbols will be prettified:
