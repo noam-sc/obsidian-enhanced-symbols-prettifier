@@ -30,7 +30,7 @@ To install the plugin manually, you need to download the latest release from the
 
 To customize this project for your needs, you can clone it and then install all dependencies with `yarn`.
 
-After the installation, you need to create a `env.mjs` file in the root directory. Fill the file with the following content:
+After the installation, you need to edit the `env.mjs` file in the root directory. Fill the file with the following content:
 
 ```js
 export const obsidianExportPath =

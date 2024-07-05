@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-symbols-prettifier",
-  "version": "1.1.4",
-  "description": "This plugin enables to prettify common text symbols like arrows.",
+  "name": "obsidian-enhanced-symbols-prettifier",
+  "version": "1.0.0",
+  "description": "Replace/substitute the symbols with actual symbols you commonly type. It also works for emojis shortcuts, abbreviations, greek letters, math symbols or other snippets/aliases you define",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -13,9 +13,9 @@
   "keywords": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FlorianWoelki/obsidian-symbols-prettifier.git"
+    "url": "git+https://github.com/noam-sc/obsidian-enhanced-symbols-prettifier.git"
   },
-  "author": "Florian Woelki",
+  "author": "Noam Schmitt",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^16.11.6",

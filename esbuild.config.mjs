@@ -12,6 +12,16 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = process.argv[2] === 'production';
 
+const plugins = prod
+	? []
+	: [
+			copyFilesPlugin({
+				'./main.js': `${obsidianExportPath}/main.js`,
+				'./manifest.json': `${obsidianExportPath}/manifest.json`,
+				'./src/styles.css': `${obsidianExportPath}/styles.css`,
+			}),
+		];
+
 esbuild
 	.build({
 		banner: {
@@ -55,12 +65,6 @@ esbuild
 		sourcemap: prod ? false : 'inline',
 		treeShaking: true,
 		outfile: 'main.js',
-		plugins: [
-			copyFilesPlugin({
-				'./main.js': `${obsidianExportPath}/main.js`,
-				'./manifest.json': `${obsidianExportPath}/manifest.json`,
-				'./src/styles.css': `${obsidianExportPath}/styles.css`,
-			}),
-		],
+		plugins,
 	})
-	.catch(() => process.exit(1));
+	.catch(() => process.exitCode = 1);

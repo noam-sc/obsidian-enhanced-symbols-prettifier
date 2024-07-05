@@ -1,0 +1,1 @@
+export const obsidianExportPath = '<path-to-obsidian-vault>/.obsidian/plugins/obsidian-enhanced-symbols-prettifier';
