@@ -60,9 +60,7 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 	}
 
 	displayGroup(group: string, containerEl: HTMLElement): void {
-		containerEl.createEl('h3', {
-			text: group,
-		});
+		new Setting(containerEl).setName(group).setHeading();
 
 		new Setting(containerEl).setName('Disable group').addToggle((toggle) =>
 			toggle
