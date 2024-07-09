@@ -181,7 +181,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 	}
 
 	private isCursorInUnwantedBlocks(editor: Editor): boolean {
-		const unwantedBlocks = [/(?<!`)`[^`\n]+`(?!`)/, /```\w*\s*[\s\S]*?```/]; // inline code, full code
+		const unwantedBlocks = [/(^|[^`])(`[^`\n]+`)([^`]|$)/, /```\w*\s*[\s\S]*?```/]; // inline code, full code
 
 		return (
 			unwantedBlocks.filter((unwantedBlock) => {

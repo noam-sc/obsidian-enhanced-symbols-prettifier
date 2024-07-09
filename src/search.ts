@@ -29,6 +29,12 @@ export class SearchCursor {
 		if (match?.index == null) {
 			return undefined;
 		}
+		if (match.length === 4) {
+			this._from = this._caret + match.index + match[1].length;
+			this._to = this._caret + match.index + match[1].length + match[2].length;
+			this._caret = this._to;
+			return match;
+		}
 		this._from = this._caret + match.index;
 		this._to = this._caret + match.index + match[0].length;
 		this._caret = this._to;
