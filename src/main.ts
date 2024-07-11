@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
+import { Editor, Notice, Plugin } from 'obsidian';
 import { SearchCursor } from 'src/search';
 import { EnhancedSymbolsPrettifierSettingsTab } from './settings';
 import { DEFAULT_SETTINGS, Settings } from './defaultSettings';
@@ -124,12 +124,12 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 	}
 
 	private keyDownEvent(event: KeyboardEvent) {
-		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		const editor = this.app.workspace.activeEditor?.editor;
 
-		if (view) {
-			const cursor = view.editor.getCursor();
+		if (editor) {
+			const cursor = editor.getCursor();
 			if (event.key === ' ') {
-				const line = view.editor.getLine(cursor.line);
+				const line = editor.getLine(cursor.line);
 				let from = -1;
 				let sequence = '';
 				for (let i = cursor.ch - 1; i >= 0; i--) {
@@ -157,9 +157,9 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 					sequence.length > 0 &&
 					from !== -1 &&
 					typeof replaceCharacter !== 'function' &&
-					!this.isCursorInUnwantedBlocks(view.editor)
+					!this.isCursorInUnwantedBlocks(editor)
 				) {
-					view.editor.replaceRange(
+					editor.replaceRange(
 						replaceCharacter,
 						{ line: cursor.line, ch: from },
 						{ line: cursor.line, ch: cursor.ch }
