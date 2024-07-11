@@ -4,6 +4,6 @@
 	"version": "1.0.0",
 	"minAppVersion": "0.9.12",
 	"description": "Replace/substitute the symbols with actual symbols you commonly type. It also works for emojis shortcuts, abbreviations, greek letters, math symbols or other snippets/aliases you define",
-	"author": "Noam Schmitt",
+	"author": "Noam Schmitt and Florian Woelki",
 	"isDesktopOnly": false
 }
