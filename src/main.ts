@@ -13,7 +13,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		);
 
 		this.addCommand({
-			id: 'symbols-prettifier-format-symbols',
+			id: 'format-symbols',
 			name: 'Prettify existing symbols in document',
 			editorCallback: (editor) => this.prettifyInDocument(editor),
 		});
@@ -114,7 +114,13 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		});
 
 		editor.setValue(value);
-		new Notice(`Replaced ${replacementsCount} symbol.s`);
+		if (replacementsCount === 0) {
+			new Notice('No symbols found to replace');
+		} else if (replacementsCount === 1) {
+			new Notice('Replaced 1 symbol');
+		} else  {
+			new Notice(`Replaced ${replacementsCount} symbols`);
+		}
 	}
 
 	private keyDownEvent(event: KeyboardEvent) {
