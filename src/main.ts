@@ -18,7 +18,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			editorCallback: (editor) => this.prettifyInDocument(editor),
 		});
 
-		this.registerDomEvent(document, 'keydown', (event: KeyboardEvent) => {
+		this.registerDomEvent(window, 'keydown', (event: KeyboardEvent) => {
 			this.keyDownEvent(event);
 		});
 	}
