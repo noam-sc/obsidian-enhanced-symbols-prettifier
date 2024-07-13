@@ -66,5 +66,9 @@ const context = await esbuild.context({
 	plugins,
 });
 
-await context.rebuild();
-process.exit(0);
+if (prod) {
+	await context.build();
+	process.exit(0);
+} else {
+	await context.watch();
+}
