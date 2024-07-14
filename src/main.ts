@@ -39,6 +39,14 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 	}
 
 	async saveSettings() {
+		const keys = Object.keys(this.settings.replacements);
+		keys.forEach((key) => {
+			const replacement = this.settings.replacements[key];
+			if (replacement.replaced !== key) {
+				this.settings.replacements[replacement.replaced] = replacement;
+				delete this.settings.replacements[key];
+			}
+		});
 		await this.saveData(this.settings);
 	}
 
@@ -170,7 +178,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 	}
 
 	private escapeRegExp(string: string): string {
-		return string.replace(/[.*+?^!${}()|[\]\\]/g, '\\$&');
+		return string.replace(/[.*+?^!${}()|[<>\]\\]/g, '\\$&');
 	}
 
 	private getCodeBlocks(input: string) {
