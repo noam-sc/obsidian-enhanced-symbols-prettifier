@@ -36,9 +36,10 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			DEFAULT_SETTINGS.replacements,
 			this.settings.replacements
 		);
+		this.validateSettings();
 	}
 
-	async saveSettings() {
+	private validateSettings() {
 		const keys = Object.keys(this.settings.replacements);
 		keys.forEach((key) => {
 			const replacement = this.settings.replacements[key];
@@ -47,6 +48,10 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				delete this.settings.replacements[key];
 			}
 		});
+	}
+
+	async saveSettings() {
+		this.validateSettings();
 		await this.saveData(this.settings);
 	}
 
@@ -133,7 +138,6 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 
 	private keyDownEvent(event: KeyboardEvent) {
 		const editor = this.app.workspace.activeEditor?.editor;
-
 		if (editor) {
 			const cursor = editor.getCursor();
 			if (event.key === ' ') {
