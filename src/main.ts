@@ -18,6 +18,12 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			editorCallback: (editor) => this.prettifyInDocument(editor),
 		});
 
+		this.addCommand({
+			id: 'format-symbols-reverse',
+			name: 'Unprettify existing symbols in document',
+			editorCallback: (editor) => this.prettifyInDocument(editor, true),
+		});
+
 		this.registerDomEvent(window, 'keydown', (event: KeyboardEvent) => {
 			this.keyDownEvent(event);
 		});
@@ -62,18 +68,15 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		await this.saveSettings();
 	}
 
-	private prettifyInDocument(editor: Editor) {
-		let value = editor.getValue();
-		const codeBlocks = this.getCodeBlocks(value);
-		let matchedChars: { from: number; to: number }[] = [];
-
+	private getRegex(reverse = false): RegExp {
 		const matchChars = Object.entries(this.settings.replacements).reduce(
-			(prev, [curr]) => {
+			(prev, [key, replacement]) => {
+				const curr = reverse ? replacement.value : replacement.replaced;
 				if (prev.length === 0) {
 					return prev + this.escapeRegExp(curr);
 				} else if (
 					curr.length === 0 ||
-					this.settings.replacements[curr].disabled
+					replacement.disabled
 				) {
 					return prev;
 				}
@@ -82,9 +85,19 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			''
 		);
 
+		return new RegExp(
+			'(?<![\\wÀ-ÖØ-öø-ÿ])(' + matchChars + ')(?![\\wÀ-ÖØ-öø-ÿ])'
+		);
+	}
+
+	private prettifyInDocument(editor: Editor, reverse = false) {
+		let value = editor.getValue();
+		const codeBlocks = this.getCodeBlocks(value);
+		let matchedChars: { from: number; to: number }[] = [];
+
 		const searchCursor = new SearchCursor(
 			value,
-			'(?<![\\wÀ-ÖØ-öø-ÿ])(' + matchChars + ')(?![\\wÀ-ÖØ-öø-ÿ])',
+			this.getRegex(reverse),
 			0
 		);
 		while (searchCursor.findNext() !== undefined) {
@@ -108,7 +121,15 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				matchedChar.to - diff
 			);
 
-			const replacement = this.settings.replacements[symbol];
+			let replacement;
+			if (reverse) {
+				replacement = Object.entries(
+					this.settings.replacements
+				).find(([, replacement]) => replacement.value === symbol)?.[1];
+			} else {
+				replacement = this.settings.replacements[symbol];
+			}
+
 
 			if (!replacement) {
 				return;
@@ -118,7 +139,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				return;
 			}
 
-			const character = replacement.value;
+			const character = reverse ? replacement.replaced : replacement.value;
 
 			value =
 				value.substring(0, matchedChar.from - diff) +

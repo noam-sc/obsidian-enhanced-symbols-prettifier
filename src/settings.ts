@@ -19,7 +19,15 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 		let key = replacement.replaced;
 		new Setting(containerEl)
 			.setName(`${i}.`)
-			.setDesc(`${replacement.count ? replacement.count + ' total replacement' + (replacement.count > 1 ? 's' : '') : ''}`)
+			.setDesc(
+				`${
+					replacement.count
+						? replacement.count +
+							' total replacement' +
+							(replacement.count > 1 ? 's' : '')
+						: ''
+				}`
+			)
 			.addText((text) =>
 				text
 					.setPlaceholder('To replace')
@@ -95,16 +103,19 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 		}
 
 		new Setting(containerEl).setName('Add new symbol').addButton((button) =>
-			button.setButtonText('Add').onClick(async () => {
-				this.plugin.settings.replacements[''] = {
-					replaced: '',
-					value: '',
-					disabled: false,
-					group: group,
-				};
-				await this.plugin.saveSettings();
-				this.display();
-			})
+			button
+				.setButtonText('Add')
+				.setCta()
+				.onClick(async () => {
+					this.plugin.settings.replacements[''] = {
+						replaced: '',
+						value: '',
+						disabled: false,
+						group: group,
+					};
+					await this.plugin.saveSettings();
+					this.display();
+				})
 		);
 	}
 
@@ -137,28 +148,47 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 				})
 			)
 			.addButton((button) =>
-				button.setButtonText('Add').onClick(async () => {
-					const groupName = textNewGroup;
-					if (groupName) {
-						this.plugin.settings.replacements[''] = {
-							replaced: '',
-							value: '',
-							disabled: false,
-							group: groupName,
-						};
-						await this.plugin.saveSettings();
-						this.display();
-					}
-				})
+				button
+					.setButtonText('Add')
+					.setCta()
+					.onClick(async () => {
+						const groupName = textNewGroup;
+						if (groupName) {
+							this.plugin.settings.replacements[''] = {
+								replaced: '',
+								value: '',
+								disabled: false,
+								group: groupName,
+							};
+							await this.plugin.saveSettings();
+							this.display();
+						}
+					})
 			);
 
-		new Setting(containerEl)
-			.setName('Reset to default')
-			.addButton((button) =>
-				button.setButtonText('Reset').onClick(async () => {
-					await this.plugin.restoreDefaultSettings();
+		new Setting(containerEl).setName('Reset statistics').addButton((button) =>
+			button
+				.setButtonText('Reset')
+				.setWarning()
+				.onClick(async () => {
+					for (const key in this.plugin.settings.replacements) {
+						delete this.plugin.settings.replacements[key].count;
+					}
+					await this.plugin.saveSettings();
 					this.display();
 				})
+		);
+
+		new Setting(containerEl)
+			.setName('Restore settings to default')
+			.addButton((button) =>
+				button
+					.setButtonText('Restore settings')
+					.setWarning()
+					.onClick(async () => {
+						await this.plugin.restoreDefaultSettings();
+						this.display();
+					})
 			);
 
 		containerEl.createEl('p', {
