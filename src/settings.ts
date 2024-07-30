@@ -18,7 +18,8 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 		const value = replacement.value;
 		let key = replacement.replaced;
 		new Setting(containerEl)
-			.setName(`${i}`)
+			.setName(`${i}.`)
+			.setDesc(`${replacement.count ? replacement.count + ' total replacement' + (replacement.count > 1 ? 's' : '') : ''}`)
 			.addText((text) =>
 				text
 					.setPlaceholder('To replace')

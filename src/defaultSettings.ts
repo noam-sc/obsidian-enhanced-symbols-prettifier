@@ -7,6 +7,7 @@ export interface Substitution {
 	value: string;
 	disabled?: boolean;
 	group: string;
+	count?: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {

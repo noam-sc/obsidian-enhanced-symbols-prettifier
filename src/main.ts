@@ -23,7 +23,9 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		});
 	}
 
-	onunload() {}
+	async onunload() {
+		await this.saveSettings();
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(
@@ -106,11 +108,11 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				matchedChar.to - diff
 			);
 
-			if (!this.settings.replacements[symbol]) {
+			const replacement = this.settings.replacements[symbol];
+
+			if (!replacement) {
 				return;
 			}
-
-			const replacement = this.settings.replacements[symbol];
 
 			if (replacement.disabled) {
 				return;
@@ -124,6 +126,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				value.substring(matchedChar.to - diff);
 			diff += symbol.length - character.length;
 			replacementsCount++;
+			replacement.count = replacement.count ? replacement.count + 1 : 1;
 		});
 
 		editor.setValue(value);
@@ -176,6 +179,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 						{ line: cursor.line, ch: from },
 						{ line: cursor.line, ch: cursor.ch }
 					);
+					replacement.count = replacement.count ? replacement.count + 1 : 1;
 				}
 			}
 		}
