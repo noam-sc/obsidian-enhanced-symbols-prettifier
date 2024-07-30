@@ -84,7 +84,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 
 		const searchCursor = new SearchCursor(
 			value,
-			new RegExp('(?<![\\w\\d])' + matchChars + '(?![\\w\\d])'),
+			'(?<![\\wÀ-ÖØ-öø-ÿ])(' + matchChars + ')(?![\\wÀ-ÖØ-öø-ÿ])',
 			0
 		);
 		while (searchCursor.findNext() !== undefined) {
