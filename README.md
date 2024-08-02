@@ -22,6 +22,10 @@ If you want to customize the symbols, you can do so by going to the settings of 
 
 ## Installation
 
+### From Obsidian
+
+You can install the plugin from the Obsidian app by going to `Settings -> Community plugins -> Browse` and then searching for `Enhanced Symbols Prettifier`.
+
 ### Manual Installation
 
 To install the plugin manually, you need to download the latest release from the release page. Afterward, you can extract the zip file and copy the folder to your Obsidian vault's plugin directory. You can find the plugin directory by going to `Settings -> Community plugins -> Installed plugins -> Folder icon`.
