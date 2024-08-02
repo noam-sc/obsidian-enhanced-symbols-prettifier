@@ -34,6 +34,11 @@ Or you can install the plugin from the Obsidian app by going to `Settings -> Com
 
 To install the plugin manually, you need to download the latest release from the release page. Afterward, you can extract the zip file and copy the folder to your Obsidian vault's plugin directory. You can find the plugin directory by going to `Settings -> Community plugins -> Installed plugins -> Folder icon`.
 
+## After Installation
+
+- You can configure your own shortcuts in the settings of the plugin.
+- You may also set up the hotkey "Prettify existing symbols in document" to prettify the symbols in the current note.
+
 ## FAQ - Frequently Asked Questions
 
 ### Is it replacing the actual characters on the file or just changing how Obsidian displays them?
