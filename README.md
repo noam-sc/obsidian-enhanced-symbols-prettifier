@@ -20,15 +20,29 @@ If you want to customize the symbols, you can do so by going to the settings of 
 
 ![Settings Image](./assets/settings.png)
 
+You can also temporarily disable some replacements by using the toggles in the settings.
+
 ## Installation
 
 ### From Obsidian
 
-You can install the plugin from the Obsidian app by going to `Settings -> Community plugins -> Browse` and then searching for `Enhanced Symbols Prettifier`.
+You can click [this link](obsidian://show-plugin?id=enhanced-symbols-prettifier) to install the plugin directly from Obsidian.
+
+Or you can install the plugin from the Obsidian app by going to `Settings -> Community plugins -> Browse` and then searching for `Enhanced Symbols Prettifier`.
 
 ### Manual Installation
 
 To install the plugin manually, you need to download the latest release from the release page. Afterward, you can extract the zip file and copy the folder to your Obsidian vault's plugin directory. You can find the plugin directory by going to `Settings -> Community plugins -> Installed plugins -> Folder icon`.
+
+## FAQ - Frequently Asked Questions
+
+### Is it replacing the actual characters on the file or just changing how Obsidian displays them?
+
+It is replacing the actual characters in the file. You'll see the prettified characters outside of Obsidian as well.
+
+### Does it work in canvas ?
+
+Yes. Both canvas cards and embedded notes are supported.
 
 ## Development
 
