@@ -1,4 +1,4 @@
-import { Editor, Notice, Plugin } from 'obsidian';
+import { Editor, Notice, Plugin, Platform } from 'obsidian';
 import { SearchCursor } from 'src/search';
 import { EnhancedSymbolsPrettifierSettingsTab } from './settings';
 import { DEFAULT_SETTINGS, Settings } from './defaultSettings';
@@ -24,9 +24,15 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			editorCallback: (editor) => this.prettifyInDocument(editor, true),
 		});
 
-		this.registerDomEvent(window, 'keydown', (event: KeyboardEvent) => {
-			this.keyDownEvent(event);
-		});
+		if (Platform.isMobileApp) {
+			this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
+				this.keyDownEvent(event);
+			});
+		} else {
+			this.registerDomEvent(document, 'keydown', (event: KeyboardEvent) => {
+				this.keyDownEvent(event);
+			});
+		}
 	}
 
 	async onunload() {
@@ -164,8 +170,15 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		const editor = this.app.workspace.activeEditor?.editor;
 		if (editor) {
 			const cursor = editor.getCursor();
-			if (event.key === ' ') {
-				const line = editor.getLine(cursor.line);
+			const line = editor.getLine(cursor.line);
+
+			let isSpacebar = false;
+			if (Platform.isMobileApp) {
+				isSpacebar = line.charAt(cursor.ch-1) === ' ';
+				cursor.ch = cursor.ch - 1;
+			}
+			
+			if (event.key === ' ' || isSpacebar) {
 				let from = -1;
 				let sequence = '';
 				for (let i = cursor.ch - 1; i >= 0; i--) {
