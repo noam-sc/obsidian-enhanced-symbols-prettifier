@@ -1,7 +1,7 @@
 {
 	"id": "enhanced-symbols-prettifier",
 	"name": "Enhanced Symbols Prettifier",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"minAppVersion": "0.9.12",
 	"description": "Replace/substitute the symbols with actual symbols you commonly type. It also works for emojis shortcuts, abbreviations, greek letters, math symbols or other snippets/aliases you define",
 	"author": "Noam Schmitt and Florian Woelki",

@@ -1,6 +1,6 @@
 {
   "name": "enhanced-symbols-prettifier",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Replace/substitute the symbols with actual symbols you commonly type. It also works for emojis shortcuts, abbreviations, greek letters, math symbols or other snippets/aliases you define",
   "main": "main.js",
   "scripts": {
