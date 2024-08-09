@@ -1,4 +1,5 @@
 import { Editor, Notice, Plugin, Platform } from 'obsidian';
+import { EditorView } from '@codemirror/view';
 import { SearchCursor } from 'src/search';
 import { EnhancedSymbolsPrettifierSettingsTab } from './settings';
 import { DEFAULT_SETTINGS, Settings } from './defaultSettings';
@@ -24,15 +25,15 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			editorCallback: (editor) => this.prettifyInDocument(editor, true),
 		});
 
+		let eventName = 'keydown' as keyof WindowEventMap;
+
 		if (Platform.isMobileApp) {
-			this.registerDomEvent(window, 'keyup', (event: KeyboardEvent) => {
-				this.keyDownEvent(event);
-			});
-		} else {
-			this.registerDomEvent(document, 'keydown', (event: KeyboardEvent) => {
-				this.keyDownEvent(event);
-			});
+			eventName = 'keyup' as keyof WindowEventMap;
 		}
+
+		this.registerDomEvent(window, eventName, (event: KeyboardEvent) => {
+			this.keyDownEvent(event);
+		});
 	}
 
 	async onunload() {
@@ -80,10 +81,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				const curr = reverse ? replacement.value : replacement.replaced;
 				if (prev.length === 0) {
 					return prev + this.escapeRegExp(curr);
-				} else if (
-					curr.length === 0 ||
-					replacement.disabled
-				) {
+				} else if (curr.length === 0 || replacement.disabled) {
 					return prev;
 				}
 				return prev + '|' + this.escapeRegExp(curr);
@@ -101,11 +99,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		const codeBlocks = this.getCodeBlocks(value);
 		let matchedChars: { from: number; to: number }[] = [];
 
-		const searchCursor = new SearchCursor(
-			value,
-			this.getRegex(reverse),
-			0
-		);
+		const searchCursor = new SearchCursor(value, this.getRegex(reverse), 0);
 		while (searchCursor.findNext() !== undefined) {
 			matchedChars.push({
 				from: searchCursor.from(),
@@ -129,13 +123,12 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 
 			let replacement;
 			if (reverse) {
-				replacement = Object.entries(
-					this.settings.replacements
-				).find(([, replacement]) => replacement.value === symbol)?.[1];
+				replacement = Object.entries(this.settings.replacements).find(
+					([, replacement]) => replacement.value === symbol
+				)?.[1];
 			} else {
 				replacement = this.settings.replacements[symbol];
 			}
-
 
 			if (!replacement) {
 				return;
@@ -145,7 +138,9 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				return;
 			}
 
-			const character = reverse ? replacement.replaced : replacement.value;
+			const character = reverse
+				? replacement.replaced
+				: replacement.value;
 
 			value =
 				value.substring(0, matchedChar.from - diff) +
@@ -161,7 +156,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 			new Notice('No symbols found to replace');
 		} else if (replacementsCount === 1) {
 			new Notice('Replaced 1 symbol');
-		} else  {
+		} else {
 			new Notice(`Replaced ${replacementsCount} symbols`);
 		}
 	}
@@ -174,10 +169,10 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 
 			let isSpacebar = false;
 			if (Platform.isMobileApp) {
-				isSpacebar = line.charAt(cursor.ch-1) === ' ';
+				isSpacebar = line.charAt(cursor.ch - 1) === ' ';
 				cursor.ch = cursor.ch - 1;
 			}
-			
+
 			if (event.key === ' ' || isSpacebar) {
 				let from = -1;
 				let sequence = '';
@@ -208,12 +203,36 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 					typeof replaceCharacter !== 'function' &&
 					!this.isCursorInUnwantedBlocks(editor)
 				) {
-					editor.replaceRange(
-						replaceCharacter,
-						{ line: cursor.line, ch: from },
-						{ line: cursor.line, ch: cursor.ch }
-					);
-					replacement.count = replacement.count ? replacement.count + 1 : 1;
+					// @ts-expect-error, not typed
+					const tableCell = editor.editorComponent.tableCell;
+
+					if (tableCell) {
+						const editorView = tableCell.cm as EditorView;
+
+						if (editorView) {
+							const cursorPosition =
+								editorView.state.selection.main.head - (Platform.isMobileApp ? 1 : 0);
+							const fromPosition =
+								cursorPosition - (cursor.ch - from);
+							const toPosition = cursorPosition;
+							editorView.dispatch({
+								changes: {
+									from: fromPosition,
+									to: toPosition,
+									insert: replaceCharacter,
+								},
+							});
+						}
+					} else {
+						editor.replaceRange(
+							replaceCharacter,
+							{ line: cursor.line, ch: from },
+							{ line: cursor.line, ch: cursor.ch }
+						);
+					}
+					replacement.count = replacement.count
+						? replacement.count + 1
+						: 1;
 				}
 			}
 		}
@@ -237,7 +256,10 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 	}
 
 	private isCursorInUnwantedBlocks(editor: Editor): boolean {
-		const unwantedBlocks = [/(^|[^`])(`[^`\n]+`)([^`]|$)/, /```\w*\s*[\s\S]*?```/]; // inline code, full code
+		const unwantedBlocks = [
+			/(^|[^`])(`[^`\n]+`)([^`]|$)/,
+			/```\w*\s*[\s\S]*?```/,
+		]; // inline code, full code
 
 		return (
 			unwantedBlocks.filter((unwantedBlock) => {
