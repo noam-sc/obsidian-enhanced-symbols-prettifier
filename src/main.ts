@@ -1,8 +1,8 @@
 import { Editor, Notice, Plugin, Platform } from 'obsidian';
 import { EditorView } from '@codemirror/view';
 import { SearchCursor } from 'src/search';
-import { EnhancedSymbolsPrettifierSettingsTab } from './settings';
-import { DEFAULT_SETTINGS, Settings } from './defaultSettings';
+import { EnhancedSymbolsPrettifierSettingsTab } from './settings/settings';
+import { DEFAULT_SETTINGS, Settings } from './settings/defaultSettings';
 
 export default class EnhancedSymbolsPrettifier extends Plugin {
 	settings: Settings;
@@ -211,7 +211,8 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 
 						if (editorView) {
 							const cursorPosition =
-								editorView.state.selection.main.head - (Platform.isMobileApp ? 1 : 0);
+								editorView.state.selection.main.head -
+								(Platform.isMobileApp ? 1 : 0);
 							const fromPosition =
 								cursorPosition - (cursor.ch - from);
 							const toPosition = cursorPosition;
