@@ -24,3 +24,4 @@ data.json
 
 env.mjs
 package-lock.json
+/public/
