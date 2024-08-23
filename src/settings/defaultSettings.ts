@@ -197,6 +197,11 @@ export const DEFAULT_SETTINGS: Settings = {
 			value: '∧',
 			group: 'Mathematical Operators',
 		},
+		'+/-': {
+			replaced: '+/-',
+			value: '±',
+			group: 'Mathematical Operators',
+		},
 		'...': {
 			replaced: '...',
 			value: '…',
