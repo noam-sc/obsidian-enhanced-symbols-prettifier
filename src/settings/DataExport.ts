@@ -13,7 +13,7 @@ export class DataMapper {
 		Object.keys(this.settings.replacements).forEach((key) => {
 			const replacement = this.settings.replacements[key];
 			if (group === 'all' || replacement.group === group) {
-				exportData[key] = replacement;
+				exportData[key] = { ...replacement };
 				delete exportData[key].count;
 				delete exportData[key].disabled;
 			}
