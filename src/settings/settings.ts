@@ -8,9 +8,16 @@ import {
 	DropdownComponent,
 } from 'obsidian';
 import { DataMapper } from './DataExport';
+import ShortcutsFinder from '../finder/ShortcutsFinder';
+
+const DEFAULT_SHORTCUTS_DISPLAYED = 10;
+const DEFAULT_SHORTCUTS_INCREMENT = 5;
+const DEFAULT_SHORTCUTS_GROUP = 'Words';
 
 export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 	plugin: EnhancedSymbolsPrettifier;
+	shortcutsToDisplay: Record<string, Record<string, number>> = {};
+	shortcutsDisplayed = DEFAULT_SHORTCUTS_DISPLAYED;
 
 	constructor(app: App, plugin: EnhancedSymbolsPrettifier) {
 		super(app, plugin);
@@ -29,9 +36,10 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 			.setDesc(
 				`${
 					replacement.count
-						? 'Triggered ' + replacement.count +
-							' time' +
-							(replacement.count > 1 ? 's' : '')
+						? 'Triggered ' +
+						  replacement.count +
+						  ' time' +
+						  (replacement.count > 1 ? 's' : '')
 						: ''
 				}`
 			)
@@ -210,9 +218,186 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 			);
 	}
 
+	displaySuggestedShorcut(
+		containerEl: HTMLElement,
+		shortcut: string,
+		value: string,
+		count: number
+	): void {
+		new Setting(containerEl)
+			.setName(`Replace '${shortcut}' with '${value}'`)
+			.setDesc(`Found ${count} time${count > 1 ? 's' : ''}`)
+			.addText((text) =>
+				text
+					.setPlaceholder('To replace')
+					.setValue(shortcut)
+					.onChange(async (editedShortcut) => {
+						shortcut = editedShortcut;
+					})
+			)
+			.addButton((button) =>
+				button.setButtonText('Ignore').onClick(async () => {
+					if (!this.plugin.settings.exclusions) {
+						this.plugin.settings.exclusions = [];
+					}
+					this.plugin.settings.exclusions.push(shortcut);
+					await this.plugin.saveSettings();
+					this.display();
+				})
+			)
+			.addButton((button) =>
+				button
+					.setButtonText('Add')
+					.setCta()
+					.onClick(async () => {
+						this.plugin.settings.replacements[shortcut] = {
+							replaced: shortcut,
+							value: value,
+							disabled: false,
+							group: DEFAULT_SHORTCUTS_GROUP,
+						};
+						await this.plugin.saveSettings();
+						this.display();
+						new Notice('Shortcut added');
+					})
+			);
+	}
+
+	displayFinder(containerEl: HTMLElement): void {
+		const excluded_shortcuts = this.plugin.settings.exclusions || [];
+		for (const key in this.plugin.settings.replacements) {
+			const replacement = this.plugin.settings.replacements[key];
+			excluded_shortcuts.push(replacement.replaced);
+		}
+		const excluded_words = Object.keys(
+			this.plugin.settings.replacements
+		).map((key) => this.plugin.settings.replacements[key].value);
+		const shortcutsFinder = new ShortcutsFinder(
+			this.plugin,
+			excluded_shortcuts,
+			excluded_words
+		);
+		new Setting(containerEl)
+			.setName('Find most used words')
+			.setDesc(
+				'Find the most used words in your notes to create shorcuts for them. This operation may take a while depending on the number of notes in your vault.'
+			)
+			.addButton((button) =>
+				button
+					.setIcon('file-search')
+					.setCta()
+					.onClick(async () => {
+						this.shortcutsDisplayed = DEFAULT_SHORTCUTS_DISPLAYED;
+						button.setDisabled(true);
+						const shortcuts = await shortcutsFinder.findShortcuts();
+						this.shortcutsToDisplay = shortcuts;
+						this.display();
+						new Notice('End of search');
+					})
+			);
+
+		if (Object.keys(this.shortcutsToDisplay).length > 0) {
+			new Setting(containerEl)
+				.setName('Suggested shortcuts')
+				.setDesc(
+					'Here are the most used words in your notes. You can add them as shortcuts with the suggested one or customize them.'
+				)
+				.setHeading();
+
+			let counter = 0;
+			for (const shortcut in this.shortcutsToDisplay) {
+				if (
+					this.plugin.settings.exclusions &&
+					this.plugin.settings.exclusions.includes(shortcut)
+				) {
+					continue;
+				}
+				const shortcutItem = this.shortcutsToDisplay[shortcut];
+				const replacement = Object.keys(shortcutItem)[0];
+				const count = shortcutItem[replacement];
+				this.displaySuggestedShorcut(
+					containerEl,
+					shortcut,
+					replacement,
+					count
+				);
+				counter++;
+				if (counter === this.shortcutsDisplayed) {
+					break;
+				}
+			}
+
+			if (
+				Object.keys(this.shortcutsToDisplay).length >
+				this.shortcutsDisplayed
+			) {
+				new Setting(containerEl)
+					.setName('Show more shortcuts')
+					.addButton((button) =>
+						button.setButtonText('Show more').onClick(() => {
+							this.shortcutsDisplayed +=
+								DEFAULT_SHORTCUTS_INCREMENT;
+							this.display();
+						})
+					);
+			}
+		}
+	}
+
+	displayReset(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName('Reset or restore settings')
+			.setHeading();
+
+		new Setting(containerEl)
+			.setName('Reset statistics')
+			.addButton((button) =>
+				button
+					.setIcon('trash')
+					.setWarning()
+					.onClick(async () => {
+						for (const key in this.plugin.settings.replacements) {
+							delete this.plugin.settings.replacements[key].count;
+						}
+						await this.plugin.saveSettings();
+						this.display();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Restore settings to default')
+			.addButton((button) =>
+				button
+					.setIcon('archive-restore')
+					.setWarning()
+					.onClick(async () => {
+						await this.plugin.restoreDefaultSettings();
+						this.display();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Empty ignored shortcuts')
+			.setDesc(
+				'Remove all ignored shortcuts from the find most used shortcuts feature.'
+			)
+			.addButton((button) =>
+				button
+					.setIcon('trash')
+					.setWarning()
+					.onClick(async () => {
+						this.plugin.settings.exclusions = [];
+						await this.plugin.saveSettings();
+						this.display();
+					})
+			);
+	}
+
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
+
+		this.displayFinder(containerEl);
 
 		const groups = new Set<string>();
 		for (const key in this.plugin.settings.replacements) {
@@ -265,36 +450,7 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 
 		containerEl.createEl('hr');
 
-		new Setting(containerEl)
-			.setName('Reset or restore settings')
-			.setHeading();
-
-		new Setting(containerEl)
-			.setName('Reset statistics')
-			.addButton((button) =>
-				button
-					.setButtonText('Reset stats')
-					.setWarning()
-					.onClick(async () => {
-						for (const key in this.plugin.settings.replacements) {
-							delete this.plugin.settings.replacements[key].count;
-						}
-						await this.plugin.saveSettings();
-						this.display();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName('Restore settings to default')
-			.addButton((button) =>
-				button
-					.setButtonText('Restore settings')
-					.setWarning()
-					.onClick(async () => {
-						await this.plugin.restoreDefaultSettings();
-						this.display();
-					})
-			);
+		this.displayReset(containerEl);
 
 		containerEl.createEl('p', {
 			text: 'Made by Noam Schmitt based on the Symbols Prettifier plugin by Florian Woelki.',

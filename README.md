@@ -22,6 +22,12 @@ If you want to customize the symbols, you can do so by going to the settings of 
 
 You can also temporarily disable some replacements by using the toggles in the settings.
 
+### Shorcuts finder
+
+On top of the settings page, you can find your most used words in your notes to create abbreviations shortcuts for them.
+
+![Shortcuts Finder](./assets/shortcuts-finder.png)
+
 ### Share and find shortcuts
 
 In the [discussion](https://github.com/noam-sc/obsidian-enhanced-symbols-prettifier/discussions/categories/shortcuts) section, you can share your own shortcuts or find new ones that others have shared with the community.

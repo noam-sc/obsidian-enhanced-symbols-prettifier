@@ -1,5 +1,6 @@
 export interface Settings {
 	replacements: Record<string, Substitution>;
+	exclusions?: string[];
 }
 
 export interface Substitution {
@@ -258,4 +259,5 @@ export const DEFAULT_SETTINGS: Settings = {
 			group: 'Greek Letters',
 		},
 	},
+	exclusions: [],
 };
