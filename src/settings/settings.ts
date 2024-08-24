@@ -29,8 +29,8 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 			.setDesc(
 				`${
 					replacement.count
-						? replacement.count +
-							' total replacement' +
+						? 'Triggered ' + replacement.count +
+							' time' +
 							(replacement.count > 1 ? 's' : '')
 						: ''
 				}`
@@ -111,7 +111,7 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl).setName('Add new symbol').addButton((button) =>
 			button
-				.setButtonText('Add')
+				.setIcon('plus')
 				.setCta()
 				.onClick(async () => {
 					this.plugin.settings.replacements[''] = {
