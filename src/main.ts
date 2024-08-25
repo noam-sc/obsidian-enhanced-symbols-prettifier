@@ -152,6 +152,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		});
 
 		editor.setValue(value);
+		this.saveSettings();
 		if (replacementsCount === 0) {
 			new Notice('No symbols found to replace');
 		} else if (replacementsCount === 1) {
@@ -234,6 +235,7 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 					replacement.count = replacement.count
 						? replacement.count + 1
 						: 1;
+					this.saveSettings();
 				}
 			}
 		}
