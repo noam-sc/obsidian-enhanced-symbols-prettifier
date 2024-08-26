@@ -1,4 +1,4 @@
-import { Editor, Notice, Plugin, Platform } from 'obsidian';
+import { Editor, Notice, Plugin, Platform, EditorPosition } from 'obsidian';
 import { EditorView } from '@codemirror/view';
 import { SearchCursor } from 'src/search';
 import { EnhancedSymbolsPrettifierSettingsTab } from './settings/settings';
@@ -6,6 +6,13 @@ import { DEFAULT_SETTINGS, Settings } from './settings/defaultSettings';
 
 export default class EnhancedSymbolsPrettifier extends Plugin {
 	settings: Settings;
+	lastReplacement = {
+		active: false,
+		sequence: '',
+		from: 0,
+		line: 0,
+		key: '',
+	};
 	async onload() {
 		await this.loadSettings();
 
@@ -162,7 +169,44 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 		}
 	}
 
+	private applyReplacement(
+		editor: Editor,
+		cursor: EditorPosition,
+		from: number,
+		replaceCharacter: string
+	) {
+		// @ts-expect-error, not typed
+		const tableCell = editor.editorComponent.tableCell;
+
+		if (tableCell) {
+			const editorView = tableCell.cm as EditorView;
+
+			if (editorView) {
+				const cursorPosition =
+					editorView.state.selection.main.head -
+					(Platform.isMobileApp ? 1 : 0);
+				const fromPosition = cursorPosition - (cursor.ch - from);
+				const toPosition = cursorPosition;
+				editorView.dispatch({
+					changes: {
+						from: fromPosition,
+						to: toPosition,
+						insert: replaceCharacter,
+					},
+				});
+			}
+		} else {
+			editor.replaceRange(
+				replaceCharacter,
+				{ line: cursor.line, ch: from },
+				{ line: cursor.line, ch: cursor.ch }
+			);
+		}
+	}
+
 	private keyDownEvent(event: KeyboardEvent) {
+		const lastReplacementTemp = { ...this.lastReplacement };
+		this.lastReplacement.active = false;
 		const editor = this.app.workspace.activeEditor?.editor;
 		if (editor) {
 			const cursor = editor.getCursor();
@@ -201,42 +245,56 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 					replaceCharacter &&
 					sequence.length > 0 &&
 					from !== -1 &&
-					typeof replaceCharacter !== 'function' &&
 					!this.isCursorInUnwantedBlocks(editor)
 				) {
-					// @ts-expect-error, not typed
-					const tableCell = editor.editorComponent.tableCell;
-
-					if (tableCell) {
-						const editorView = tableCell.cm as EditorView;
-
-						if (editorView) {
-							const cursorPosition =
-								editorView.state.selection.main.head -
-								(Platform.isMobileApp ? 1 : 0);
-							const fromPosition =
-								cursorPosition - (cursor.ch - from);
-							const toPosition = cursorPosition;
-							editorView.dispatch({
-								changes: {
-									from: fromPosition,
-									to: toPosition,
-									insert: replaceCharacter,
-								},
-							});
-						}
-					} else {
-						editor.replaceRange(
-							replaceCharacter,
-							{ line: cursor.line, ch: from },
-							{ line: cursor.line, ch: cursor.ch }
-						);
-					}
+					this.applyReplacement(
+						editor,
+						cursor,
+						from,
+						replaceCharacter
+					);
+					this.lastReplacement = {
+						active: true,
+						sequence: sequence,
+						from: from,
+						line: cursor.line,
+						key: event.key,
+					};
 					replacement.count = replacement.count
 						? replacement.count + 1
 						: 1;
 					this.saveSettings();
 				}
+			} else if (
+				event.key === 'Backspace' ||
+				(event.key === 'Delete' && Platform.isMacOS)
+			) {
+				if (!lastReplacementTemp.active) return;
+				const replacement =
+					this.settings.replacements[lastReplacementTemp.sequence];
+				if (!replacement || replacement.disabled) return;
+				const isCursorValid =
+					cursor.line === lastReplacementTemp.line &&
+					lastReplacementTemp.from ===
+						cursor.ch - replacement.value.length;
+
+				if (!isCursorValid) return;
+
+				const lastCharacter = lastReplacementTemp.key;
+				let replaceCharacter = replacement.replaced;
+				if (lastCharacter == 'Enter') {
+					replaceCharacter += '\n';
+				} else {
+					replaceCharacter += lastCharacter;
+				}
+				this.applyReplacement(
+					editor,
+					cursor,
+					lastReplacementTemp.from,
+					replaceCharacter
+				);
+				this.lastReplacement.active = false;
+				this.saveSettings();
 			}
 		}
 	}
