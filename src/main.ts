@@ -2,7 +2,7 @@ import { Editor, Notice, Plugin, Platform, EditorPosition } from 'obsidian';
 import { EditorView } from '@codemirror/view';
 import { SearchCursor } from 'src/search';
 import { EnhancedSymbolsPrettifierSettingsTab } from './settings/settings';
-import { DEFAULT_SETTINGS, Settings } from './settings/defaultSettings';
+import { DEFAULT_SETTINGS, FLEXIBLE_WORDS_START, FLEXIBLE_WORDS_END, Settings } from './settings/defaultSettings';
 
 export default class EnhancedSymbolsPrettifier extends Plugin {
 	settings: Settings;
@@ -218,11 +218,11 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				cursor.ch = cursor.ch - 1;
 			}
 
-			if (event.key === ' ' || isSpacebar) {
+			if (this.isWordEnd(event, isSpacebar)) {
 				let from = -1;
 				let sequence = '';
 				for (let i = cursor.ch - 1; i >= 0; i--) {
-					if (line.charAt(i) === ' ') {
+					if (this.isWordStart(line, i)) {
 						const excludeWhitespace = i + 1;
 						from = excludeWhitespace;
 						sequence = line.slice(excludeWhitespace, cursor.ch);
@@ -297,6 +297,14 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				this.saveSettings();
 			}
 		}
+	}
+
+	private isWordStart(line: string, i: number) {
+		return line.charAt(i) === ' ' || (this.settings.flexibleWordsStart && FLEXIBLE_WORDS_START.includes(line.charAt(i)));
+	}
+
+	private isWordEnd(event: KeyboardEvent, isSpacebar: boolean) {
+		return event.key === ' ' || isSpacebar || (this.settings.flexibleWordsEnd && FLEXIBLE_WORDS_END.includes(event.key));
 	}
 
 	private escapeRegExp(string: string): string {

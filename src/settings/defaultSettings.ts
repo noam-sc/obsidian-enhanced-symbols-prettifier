@@ -1,6 +1,8 @@
 export interface Settings {
 	replacements: Record<string, Substitution>;
 	exclusions?: string[];
+	flexibleWordsStart?: boolean;
+	flexibleWordsEnd?: boolean;
 }
 
 export interface Substitution {
@@ -11,7 +13,25 @@ export interface Substitution {
 	count?: number;
 }
 
-export const DEFAULT_SETTINGS: Settings = {
+export const FLEXIBLE_WORDS_START = ['(', '«', "'", '"', '*'];
+
+export const FLEXIBLE_WORDS_END = [
+	'.',
+	',',
+	'!',
+	'?',
+	':',
+	';',
+	')',
+	'»',
+	"'",
+	'"',
+	'Enter',
+	'\n',
+	'*'
+];
+
+export const DEFAULT_SETTINGS = {
 	replacements: {
 		'->': {
 			replaced: '->',
@@ -260,4 +280,6 @@ export const DEFAULT_SETTINGS: Settings = {
 		},
 	},
 	exclusions: [],
+	flexibleWordsStart: true,
+	flexibleWordsEnd: true,
 };

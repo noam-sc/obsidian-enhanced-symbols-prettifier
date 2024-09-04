@@ -1,4 +1,4 @@
-import { Substitution } from './defaultSettings';
+import { DEFAULT_SETTINGS, Substitution } from './defaultSettings';
 import EnhancedSymbolsPrettifier from '../main';
 import {
 	PluginSettingTab,
@@ -344,6 +344,41 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 		}
 	}
 
+	displayBehaviorSection(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName('Behavior settings')
+			.setHeading();
+
+		new Setting(containerEl)
+			.setName('Flexible start word boundaries')
+			.setDesc(
+				'Loosen the word boundary detection by allowing symbols or punctuation (like quotes, commas, or parentheses) before a word.'
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.flexibleWordsStart || DEFAULT_SETTINGS.flexibleWordsStart)
+					.onChange(async (value) => {
+						this.plugin.settings.flexibleWordsStart = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName('Flexible end word boundaries')
+			.setDesc(
+				'Allow punctuation or symbols immediately after a word to be part of the word boundary, enabling substitutions even when the word isn\'t followed by a space.'
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.flexibleWordsEnd || DEFAULT_SETTINGS.flexibleWordsEnd)
+					.onChange(async (value) => {
+						this.plugin.settings.flexibleWordsEnd = value;
+						await this.plugin.saveSettings();
+					})
+			);
+	}
+			
+
 	displayReset(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName('Reset or restore settings')
@@ -396,6 +431,8 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
+
+		this.displayBehaviorSection(containerEl);
 
 		this.displayFinder(containerEl);
 

@@ -22,15 +22,15 @@ If you want to customize the symbols, you can do so by going to the settings of 
 
 You can also temporarily disable some replacements by using the toggles in the settings.
 
+### Share and find shortcuts
+
+In the [discussion](https://github.com/noam-sc/obsidian-enhanced-symbols-prettifier/discussions/categories/shortcuts) section, you can share your own shortcuts or find new ones that others have shared with the community.
+
 ### Shorcuts finder
 
 On top of the settings page, you can find your most used words in your notes to create abbreviations shortcuts for them.
 
 ![Shortcuts Finder](./assets/shortcuts-finder.webp)
-
-### Share and find shortcuts
-
-In the [discussion](https://github.com/noam-sc/obsidian-enhanced-symbols-prettifier/discussions/categories/shortcuts) section, you can share your own shortcuts or find new ones that others have shared with the community.
 
 ## Installation
 
@@ -58,6 +58,10 @@ It is replacing the actual characters in the file. You'll see the prettified cha
 ### Does it work in canvas ?
 
 Yes. Both canvas cards and embedded notes are supported.
+
+### How to undo a replacement?
+
+Press Backspace right after the replacement to undo it. If you just want to press backspace without undoing the replacement, you can press `Shift + Backspace`.
 
 ## Development
 
