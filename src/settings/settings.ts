@@ -155,7 +155,7 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('Import shortcuts from file')
 			.setDesc(
-				'Import other shortcuts from a JSON export file. It will override existing shortcuts.'
+				'Import additional shortcuts from a JSON export file. Any conflicting existing shortcuts will be overridden.'
 			)
 			.addButton((button) =>
 				button

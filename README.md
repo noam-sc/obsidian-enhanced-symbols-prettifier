@@ -59,6 +59,10 @@ It is replacing the actual characters in the file. You'll see the prettified cha
 
 Yes. Both canvas cards and embedded notes are supported.
 
+### One of my shortcuts doesn't work. What should I do?
+
+If your shortcut contains special characters, you may need to disable the flexible word boundaries in the settings. If it still doesn't work, please open an issue.
+
 ### How to undo a replacement?
 
 Press Backspace right after the replacement to undo it. If you just want to press backspace without undoing the replacement, you can press `Shift + Backspace`.
