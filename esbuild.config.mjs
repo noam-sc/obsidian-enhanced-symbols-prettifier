@@ -17,8 +17,7 @@ const plugins = prod
 	: [
 			copyFilesPlugin({
 				'./main.js': `${obsidianExportPath}/main.js`,
-				'./manifest.json': `${obsidianExportPath}/manifest.json`,
-				'./src/styles.css': `${obsidianExportPath}/styles.css`,
+				'./manifest.json': `${obsidianExportPath}/manifest.json`
 			}),
 	];
 
