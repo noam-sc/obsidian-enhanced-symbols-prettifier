@@ -356,7 +356,7 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) =>
 				toggle
-					.setValue(this.plugin.settings.flexibleWordsStart || DEFAULT_SETTINGS.flexibleWordsStart)
+					.setValue(this.plugin.settings.flexibleWordsStart ?? DEFAULT_SETTINGS.flexibleWordsStart)
 					.onChange(async (value) => {
 						this.plugin.settings.flexibleWordsStart = value;
 						await this.plugin.saveSettings();
@@ -370,7 +370,7 @@ export class EnhancedSymbolsPrettifierSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) =>
 				toggle
-					.setValue(this.plugin.settings.flexibleWordsEnd || DEFAULT_SETTINGS.flexibleWordsEnd)
+					.setValue(this.plugin.settings.flexibleWordsEnd ?? DEFAULT_SETTINGS.flexibleWordsEnd)
 					.onChange(async (value) => {
 						this.plugin.settings.flexibleWordsEnd = value;
 						await this.plugin.saveSettings();
