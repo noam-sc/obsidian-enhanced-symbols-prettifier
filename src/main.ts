@@ -223,10 +223,16 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 				let sequence = '';
 				for (let i = cursor.ch - 1; i >= 0; i--) {
 					if (this.isWordStart(line, i)) {
-						const excludeWhitespace = i + 1;
-						from = excludeWhitespace;
-						sequence = line.slice(excludeWhitespace, cursor.ch);
-						break;
+						const excludeWordStartIndex = i + 1;
+						from = excludeWordStartIndex;
+						sequence = line.slice(excludeWordStartIndex, cursor.ch);
+						if ((this.settings.replacements[sequence] && !this.settings.replacements[sequence].disabled) || this.isSpaceCharacter(line, i)) {
+							break;
+						} else if (i === 0) {
+							from = i;
+							sequence = line.slice(i, cursor.ch);
+							break;
+						}
 					} else if (i === 0) {
 						from = i;
 						sequence = line.slice(i, cursor.ch);
@@ -300,7 +306,11 @@ export default class EnhancedSymbolsPrettifier extends Plugin {
 	}
 
 	private isWordStart(line: string, i: number) {
-		return line.charAt(i) === ' ' || (this.settings.flexibleWordsStart && FLEXIBLE_WORDS_START.includes(line.charAt(i)));
+		return this.isSpaceCharacter(line, i) || (this.settings.flexibleWordsStart && FLEXIBLE_WORDS_START.includes(line.charAt(i)));
+	}
+
+	private isSpaceCharacter(line: string, i: number) {
+		return line.charAt(i) === ' ';
 	}
 
 	private isWordEnd(event: KeyboardEvent, isSpacebar: boolean) {
